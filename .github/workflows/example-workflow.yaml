@@ -1,8 +1,0 @@
----
-on:
-  workflow_call:
-    inputs: {}
-    secrets: {}
-jobs:
-  example-job:
-    runs-on: ubuntu-latest
