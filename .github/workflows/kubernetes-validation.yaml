@@ -58,6 +58,7 @@ jobs:
           wget -q -O- https://github.com/yannh/kubeconform/releases/download/v0.4.13/kubeconform-linux-amd64.tar.gz | tar -xzvf - kubeconform
 
       - name: Install Argo CD Cli
+        if: inputs.do-argocd-diff == true
         run: |
           wget -q -O- https://${ARGOCD_URL}/download/argocd-linux-amd64 > ${ARGOCD_BIN}
           chmod +x ${ARGOCD_BIN}
@@ -82,6 +83,7 @@ jobs:
               -schema-location ${SCHEMA_BASE_URL}/${{ matrix.destination-cluster }}/'{{ .ResourceKind }}{{ .KindSuffix }}.json'
 
       - name: Check diff
+        if: inputs.do-argocd-diff == true
         id: argocd-diff
         run: |
           set -x
@@ -129,6 +131,7 @@ jobs:
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
+        if: inputs.do-argocd-diff == true
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -136,7 +139,7 @@ jobs:
           body-includes: Diff compared to actual state for app **${{ matrix.argocd-appname }}**
 
       - name: Create comment
-        if: steps.fc.outputs.comment-id == ''
+        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == '' inputs.do-argocd-diff == true
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -144,7 +147,7 @@ jobs:
           reactions: rocket
 
       - name: Update comment
-        if: steps.fc.outputs.comment-id != '' && steps.fc.outputs.comment-body != steps.argocd-diff.outputs.body
+        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id != '' && steps.fc.outputs.comment-body != steps.argocd-diff.outputs.body
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
