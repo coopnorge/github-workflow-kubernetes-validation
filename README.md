@@ -46,7 +46,7 @@ jobs:
   <some other jobs jobs>
   kubernetes-ci:
     name: "Kubernetes CI "
-    uses: coopnorge/github-workflow-kubernetes-validation/.github/workflows/kubernetes-validation.yaml@initial-kubernetes-workflow
+    uses: coopnorge/github-workflow-kubernetes-validation/.github/workflows/kubernetes-validation.yaml@v1
     with:
       argocd-environment-matrix-json: >-
         [{
