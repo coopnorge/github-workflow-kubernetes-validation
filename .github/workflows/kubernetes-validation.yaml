@@ -58,6 +58,7 @@ jobs:
           wget -q -O- https://github.com/yannh/kubeconform/releases/download/v0.4.13/kubeconform-linux-amd64.tar.gz | tar -xzvf - kubeconform
 
       - name: Install Argo CD Cli
+        if: inputs.do-argocd-diff == true
         run: |
           wget -q -O- https://${ARGOCD_URL}/download/argocd-linux-amd64 > ${ARGOCD_BIN}
           chmod +x ${ARGOCD_BIN}
