@@ -139,7 +139,7 @@ jobs:
           body-includes: Diff compared to actual state for app **${{ matrix.argocd-appname }}**
 
       - name: Create comment
-        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == '' inputs.do-argocd-diff == true
+        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == '' 
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number }}
