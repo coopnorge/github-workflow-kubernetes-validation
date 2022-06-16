@@ -11,12 +11,12 @@ on:
           Example:
           [{
               "argocd-appname": "helloworld-api-production-helloworld",
-              "argocd-tracking-directory": "kubernetes/kustomize-deployments/production" , 
+              "argocd-tracking-directory": "kubernetes/kustomize-deployments/production" ,
               "destination-cluster" : "api-production",
             },
-            { 
+            {
               "argocd-appname": "helloworld-api-staging-helloworld",
-              "argocd-tracking-directory": "kubernetes/kustomize-deployments/staging" , 
+              "argocd-tracking-directory": "kubernetes/kustomize-deployments/staging" ,
               "destination-cluster" : "api-staging",
           }]
       do-argocd-diff:
@@ -111,7 +111,7 @@ jobs:
               exit 1
               ;;
           esac
-          
+
           echo "Diff compared to actual state for app **${{ matrix.argocd-appname }}**" > body.txt
           echo >> body.txt
           echo >> body.txt
@@ -131,7 +131,7 @@ jobs:
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
-        if: inputs.do-argocd-diff == true
+        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -139,7 +139,7 @@ jobs:
           body-includes: Diff compared to actual state for app **${{ matrix.argocd-appname }}**
 
       - name: Create comment
-        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == '' 
+        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -147,7 +147,7 @@ jobs:
           reactions: rocket
 
       - name: Update comment
-        if: inputs.do-argocd-diff == true && steps.fc.outputs.comment-id != '' && steps.fc.outputs.comment-body != steps.argocd-diff.outputs.body
+        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true && steps.fc.outputs.comment-id != '' && steps.fc.outputs.comment-body != steps.argocd-diff.outputs.body
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
