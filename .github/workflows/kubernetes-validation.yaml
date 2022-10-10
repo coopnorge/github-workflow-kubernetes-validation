@@ -25,6 +25,12 @@ on:
         type: boolean
         description: |
           Boolean to enable argocd diff.
+      kubernetes-version:
+        required: true
+        default: 1.21.14
+        type: string
+        description: |
+          Target kubernetes version. Used for schema validation.
     secrets:
       argocd-api-token:
         required: false
@@ -79,7 +85,7 @@ jobs:
             | ./kubeconform \
               -strict \
               -verbose \
-              -kubernetes-version 1.21.14 \
+              -kubernetes-version ${{ inputs.kubernetes-version }} \
               -schema-location default \
               -schema-location ${SCHEMA_BASE_URL}/${{ matrix.destination-cluster }}/'{{ .ResourceKind }}{{ .KindSuffix }}.json'
 
