@@ -79,6 +79,7 @@ jobs:
             | ./kubeconform \
               -strict \
               -verbose \
+              -kubernetes-version 1.21.14 \
               -schema-location default \
               -schema-location ${SCHEMA_BASE_URL}/${{ matrix.destination-cluster }}/'{{ .ResourceKind }}{{ .KindSuffix }}.json'
 
