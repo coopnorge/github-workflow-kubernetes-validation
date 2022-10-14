@@ -94,6 +94,10 @@ jobs:
         id: argocd-diff
         run: |
           set -x
+          ${ARGOCD_BIN} \
+            --auth-token ${ARGOCD_API_TOKEN:=EMPTY} \
+            --grpc-web --server $ARGOCD_URL \
+            app get ${{ matrix.argocd-appname}} --refresh
           set +e
           ${ARGOCD_BIN} \
             --auth-token ${ARGOCD_API_TOKEN:=EMPTY} \
