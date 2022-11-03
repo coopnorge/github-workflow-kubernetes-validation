@@ -14,5 +14,3 @@ spec:
   type: component
   lifecycle: production
   owner: cloud-platform
-  partOf:
-    - "argocd"
