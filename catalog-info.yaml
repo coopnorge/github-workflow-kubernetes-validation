@@ -3,13 +3,16 @@ kind: Component
 metadata:
   name: github-workflow-kubernetes-validation
   title: Github Workflow Kubernetes Validation
-  description: Github Action workflow for kubernetes templates and rich diff cluster state
+  description: Github Action workflow for validation of kubernetes templates and rich diff against cluster state through ArgoCD
   lables:
     - "github-workflow"
     - "kubernetes"
+    - "argocd"
   annotations:
     github.com/project-slug: coopnorge/github-workflow-kubernetes-validation
 spec:
   type: component
   lifecycle: production
   owner: cloud-platform
+  partOf:
+    - "argocd"
