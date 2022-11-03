@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: github-workflow-kubernetes-validation
+  title: Github Workflow Kubernetes Validation
+  description: Github Action workflow for kubernetes templates and rich diff cluster state
+  lables:
+    - "github-workflow"
+    - "kubernetes"
+  annotations:
+    github.com/project-slug: coopnorge/github-workflow-kubernetes-validation
+spec:
+  type: component
+  lifecycle: production
+  owner: cloud-platform
