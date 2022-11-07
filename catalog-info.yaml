@@ -11,6 +11,6 @@ metadata:
   annotations:
     github.com/project-slug: coopnorge/github-workflow-kubernetes-validation
 spec:
-  type: component
+  type: lirabry
   lifecycle: production
   owner: cloud-platform
