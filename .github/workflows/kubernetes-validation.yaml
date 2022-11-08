@@ -31,6 +31,12 @@ on:
         type: string
         description: |
           Target kubernetes version. Used for schema validation.
+      manifest-generator:
+        required: false
+        default: kustomize
+        type: string
+        description: |
+          Which tool use to render manifests. Currently supported: kustomize (default), helm and plain
     secrets:
       argocd-api-token:
         required: false
@@ -39,7 +45,7 @@ on:
 jobs:
   validate-kubernetes:
     env:
-      ARGOCD_URL: argocd.internal.coop
+      ARGOCD_DEFAULT_DNS: argocd.internal.coop
       ARGOCD_BIN: ./argocd
       SCHEMA_BASE_URL: https://raw.githubusercontent.com/coopnorge/kubernetes-schemas/main
     runs-on: ubuntu-latest
@@ -51,10 +57,48 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v3
 
+      - name: 'Set ARGOCD_URL'
+        run: |
+          if [[ "${{matrix.argocd-dns}}" == "" ]] ; then
+            echo Using default dns $ARGOCD_DEFAULT_DNS 
+            echo "ARGOCD_URL=$ARGOCD_DEFAULT_DNS" >> $GITHUB_ENV
+          else
+            echo Using overriding dns ${{matrix.argocd-dns}}
+            echo "ARGOCD_URL=${{matrix.argocd-dns}}" >> $GITHUB_ENV
+          fi
       - name: Install kustomize
+        if: ${{ inputs.manifest-generator == 'kustomize' }}
         uses: imranismail/setup-kustomize@v1
 
+      - name: Set kustomize render command
+        if: ${{ inputs.manifest-generator == 'kustomize' }}
+        run: |
+          echo "render_manifest=kustomize build ${{ matrix.argocd-tracking-directory }}" >> $GITHUB_ENV
+
+      - name: Install helm
+        if: ${{ inputs.manifest-generator == 'helm' }}
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.9.0
+
+      - name: Set helm render command
+        if: ${{ inputs.manifest-generator == 'helm' }}
+        run: |
+          echo "render_manifest=helm template ${{ matrix.argocd-tracking-directory }}" >> $GITHUB_ENV
+
+      - name: Install yq
+        if: ${{ inputs.manifest-generator == 'plain' }}
+        run: |
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ./yq &&\
+          chmod +x ./yq
+      
+      - name: Set plain render command
+        if: ${{ inputs.manifest-generator == 'plain' }}
+        run: |
+          echo "render_manifest=./yq ${{ matrix.argocd-tracking-directory }}/*" >> $GITHUB_ENV
+
       - name: Install kubescore
+        if: ${{ matrix.disable-kubescore != true  }}
         run: |
           wget -q -O- https://github.com/zegl/kube-score/releases/download/v1.14.0/kube-score_1.14.0_linux_amd64 > kube-score
           chmod +x kube-score
@@ -73,18 +117,30 @@ jobs:
         run: |
           wget -q -O- https://github.com/homeport/dyff/releases/download/v1.5.1/dyff_1.5.1_linux_amd64.tar.gz | tar -xzvf - dyff
 
-      - name: Check kube-score
+      - name: Prepare helm manifests
+        if: ${{ inputs.manifest-generator == 'helm' }}
         run: |
-          kustomize build ${{ matrix.argocd-tracking-directory }} \
+          helm dep up ${{ matrix.argocd-tracking-directory }}
+
+      - name: Lint helm manifests
+        if: ${{ inputs.manifest-generator == 'helm' }}
+        run: |
+          helm lint ${{ matrix.argocd-tracking-directory }}
+        
+      - name: Check kube-score
+        if: ${{ matrix.disable-kubescore != true  }}
+        run: |
+          ${{ env.render_manifest }} \
           | ./kube-score \
             score  -
 
       - name: Check kube-confrom
         run: |
-          kustomize build ${{ matrix.argocd-tracking-directory }} \
+          ${{ env.render_manifest }} \
             | ./kubeconform \
               -strict \
               -verbose \
+              -ignore-missing-schemas \
               -kubernetes-version ${{ inputs.kubernetes-version }} \
               -schema-location default \
               -schema-location ${SCHEMA_BASE_URL}/${{ matrix.destination-cluster }}/'{{ .ResourceKind }}{{ .KindSuffix }}.json'
@@ -149,19 +205,13 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: Diff compared to actual state for app **${{ matrix.argocd-appname }}**
 
-      - name: Create comment
-        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true && steps.fc.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.argocd-diff.outputs.body }}
-          reactions: rocket
 
       - name: Update comment
-        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true && steps.fc.outputs.comment-id != '' && steps.fc.outputs.comment-body != steps.argocd-diff.outputs.body
+        if: github.event_name == 'pull_request' && inputs.do-argocd-diff == true
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.argocd-diff.outputs.body }}
           reactions: rocket
           edit-mode: replace
