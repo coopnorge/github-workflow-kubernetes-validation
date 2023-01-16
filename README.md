@@ -32,6 +32,12 @@ inputs:
       type: boolean
       description: |
         Boolean to enable argocd diff.
+    manifest-generator:
+      required: false
+      default: kustomize
+      type: string
+      description: |
+        Which tool use to render manifests. Currently supported: kustomize (default), helm and plain
   secrets:
     argocd-api-token:
       required: false
