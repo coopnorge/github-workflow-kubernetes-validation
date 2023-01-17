@@ -54,7 +54,7 @@ jobs:
     name: "Kubernetes CI "
     uses: coopnorge/github-workflow-kubernetes-validation/.github/workflows/kubernetes-validation.yaml@v1
     with:
-      argocd-environment-matrix-json: >-
+      environment-matrix-json: >-
         [{
             "argocd-appname": "helloworld-api-production-helloworld",
             "argocd-tracking-directory": "kubernetes/kustomize-deployments/production" , 
