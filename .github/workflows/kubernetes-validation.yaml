@@ -60,7 +60,7 @@ jobs:
       - name: 'Set ARGOCD_URL'
         run: |
           if [[ "${{matrix.argocd-dns}}" == "" ]] ; then
-            echo Using default dns $ARGOCD_DEFAULT_DNS 
+            echo Using default dns $ARGOCD_DEFAULT_DNS
             echo "ARGOCD_URL=$ARGOCD_DEFAULT_DNS" >> $GITHUB_ENV
           else
             echo Using overriding dns ${{matrix.argocd-dns}}
@@ -91,7 +91,7 @@ jobs:
         run: |
           wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ./yq &&\
           chmod +x ./yq
-      
+
       - name: Set plain render command
         if: ${{ inputs.manifest-generator == 'plain' }}
         run: |
@@ -126,7 +126,7 @@ jobs:
         if: ${{ inputs.manifest-generator == 'helm' }}
         run: |
           helm lint ${{ matrix.argocd-tracking-directory }}
-        
+
       - name: Check kube-score
         if: ${{ matrix.disable-kubescore != true  }}
         run: |
@@ -185,11 +185,6 @@ jobs:
           echo "\`\`\`yaml" >> body.txt
           cat diff.txt >> body.txt
           echo "\`\`\`" >> body.txt
-          body=$(cat body.txt)
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo "::set-output name=body::$body"
 
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
@@ -212,6 +207,6 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.argocd-diff.outputs.body }}
+          body-file: body.txt
           reactions: rocket
           edit-mode: replace
