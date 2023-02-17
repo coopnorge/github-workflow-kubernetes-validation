@@ -68,7 +68,7 @@ jobs:
           fi
       - name: Install kustomize
         if: ${{ inputs.manifest-generator == 'kustomize' }}
-        uses: imranismail/setup-kustomize@v1
+        uses: imranismail/setup-kustomize@v2
 
       - name: Set kustomize render command
         if: ${{ inputs.manifest-generator == 'kustomize' }}
