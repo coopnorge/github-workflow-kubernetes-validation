@@ -178,13 +178,11 @@ jobs:
               exit 1
               ;;
           esac
-          ### cut off diff if body is to long
-          cat diff.txt | head -c 64000 > diff.txt
           echo "Diff compared to actual state for app **${{ matrix.argocd-appname }}**" > body.txt
           echo >> body.txt
           echo >> body.txt
           echo "\`\`\`yaml" >> body.txt
-          cat diff.txt >> body.txt
+          cat diff.txt | head -c 64000 >> body.txt
           echo "\`\`\`" >> body.txt
 
         env:
