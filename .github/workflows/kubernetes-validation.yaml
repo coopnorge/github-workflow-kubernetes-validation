@@ -206,6 +206,6 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body-file: body.txt
+          body-path: body.txt
           reactions: rocket
           edit-mode: replace
