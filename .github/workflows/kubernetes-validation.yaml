@@ -55,7 +55,7 @@ jobs:
     # General note, may steps need to be in setup in an OCI. Also some stuff can be migrated to an action.
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Set ARGOCD_URL'
         run: |
