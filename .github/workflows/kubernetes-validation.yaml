@@ -20,6 +20,13 @@ on:
         required: false
         description: |
           The name of the service in the docker-compose file to use for validating terraform
+      argocd-server:
+        type: string
+        default: argocd.internal.coop
+        required: false
+        description: |
+          The dns server of ArgoCD. Defaults to argocd.internal.coop
+
     secrets:
       argocd-api-token:
         required: false
@@ -40,10 +47,11 @@ jobs:
             run \
             --rm \
             -e ARGOCD_API_TOKEN=${ARGOCD_API_TOKEN} \
+            -e ARGOCD_SERVER=${ARGOCD_SERVER} \
             ${{ inputs.docker-compose-service }} validate
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
-
+          ARGOCD_SERVER: ${{ inputs.argocd-server }}
 
       - name: Check diff
         if: inputs.do-argocd-diff == true
@@ -58,6 +66,7 @@ jobs:
             --file ${GITHUB_WORKSPACE}/${{ inputs.docker-compose-file }} \
             run \
             -e ARGOCD_API_TOKEN=${ARGOCD_API_TOKEN} \
+            -e ARGOCD_SERVER=${ARGOCD_SERVER} \
             --rm \
             ${{ inputs.docker-compose-service }} argoCDDiff | head -c 64000 >> body.txt
 
@@ -65,6 +74,7 @@ jobs:
 
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
+          ARGOCD_SERVER: ${{ inputs.argocd-server }}
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
