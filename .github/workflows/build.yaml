@@ -1,7 +1,53 @@
+---
+name: CI/CD
 on:
-  pull_request:
+  pull_request: {}
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          list-files: json
+          filters: |
+            techdocs:
+              - 'docs/**'
+      - name: Debug ...
+        run: |
+          echo "::${{ steps.changes.outputs }}"
+
+  techdocs:
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.run-techdocs-ci == 'true'}}
+    concurrency:
+      group: ${{ github.repository }}-${{ github.workflow }}-techdocs-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
+    name: TechDocs
+    uses: coopnorge/github-workflow-techdocs/.github/workflows/techdocs.yaml@v0
+
   build:
+    needs:
+      - techdocs
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo hello world
+      - run: exit 1
+        name: "Catch errors"
+        if: |
+          needs.techdocs.result == 'failure'
+
