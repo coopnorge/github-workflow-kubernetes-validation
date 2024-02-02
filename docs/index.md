@@ -1,16 +1,15 @@
-# github-workflow-kubernetes-validation
-
+# GitHub workflow Kubernetes validation
 
 ## Goal
 
 > `v1` documentation below
 
-Validation of kubernetes templates and also a rich diff to state in cluster.
+Validation of Kubernetes templates and also a rich diff to state in cluster.
 
 ## Usage
 
-The workflow uses the kubernetes engineering image to run the ci steps. The
-image auto detects kubernetes objects required validating and can also produce
+The workflow uses the Kubernetes engineering image to run the CI steps. The
+image auto detects Kubernetes objects required validating and can also produce
 a diff in case of changes. To use the this in CI, setup the workflow like this:
 
 ```yaml
@@ -94,9 +93,9 @@ Make sure you update your dependabot to update docker images in `docker-compose/
           Token to get read only access to argocd. This is a global secret secrets.ARGOCD_API_TOKEN
 ```
 
-
 ## V1 Docs
-## Inputs
+
+### Inputs
 
 ```yaml
 inputs:
@@ -136,7 +135,7 @@ inputs:
         Token to get read only access to argocd. This is a global secret secrets.ARGOCD_API_TOKEN
 ```
 
-## Example
+### Example
 
 ```yaml
 jobs:
