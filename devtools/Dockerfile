@@ -1,1 +1,1 @@
-FROM ghcr.io/coopnorge/engineering-docker-images/e0/techdocs:latest@sha256:27abe5b0b13f50ef9ff5a26c04511c1cc443e7ec5d896d7319c689ffa4c3e739 AS techdocs
+FROM ghcr.io/coopnorge/engineering-docker-images/e0/techdocs:latest@sha256:23e3f1804d3447eb15374e70046c658b6db5c3d0f3185b5a6d0b19dc3c4a91c9 AS techdocs
