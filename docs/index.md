@@ -95,7 +95,7 @@ Make sure you update your dependabot to update docker images in `docker-compose/
 
 ## V1 Docs
 
-### Inputs
+### v1 Inputs
 
 ```yaml
 inputs:
