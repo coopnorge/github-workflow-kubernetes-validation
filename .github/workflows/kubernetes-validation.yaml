@@ -64,6 +64,8 @@ jobs:
         if: inputs.do-argocd-diff == true
         id: argocd-diff
         run: |
+          set -o pipefail
+
           echo "ArgoCD Diff" > body.txt
           echo >> body.txt
           echo >> body.txt
