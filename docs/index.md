@@ -46,7 +46,7 @@ And have in your `docker-compose.yaml`
 and in `docker-compose/Dockerfile` have atleast this image
 
 ```dockerfile
-FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-kubernetes-v1beta1:latest@sha256:db0e83c6ae634f27c14c1b3ff55e1b12d94066222380b1cada65ae72023b5fc6 AS kubernetes-devtools
+FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-kubernetes-v1beta1:latest@sha256:6cab3cd24ce510d11105deb0777df7d2c2e959eaed44e049d5ecd2304e217a12 AS kubernetes-devtools
 ```
 
 Make sure you update your dependabot to update docker images in `docker-compose/Dockerfile`
