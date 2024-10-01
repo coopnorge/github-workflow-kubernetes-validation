@@ -12,7 +12,7 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' || github.event_name == 'workflow_dispatch' }}
+      run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' || steps.changes.outputs.devtools == 'true' || github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -22,6 +22,10 @@ jobs:
           filters: |
             techdocs:
               - 'docs/**'
+            devtools:
+              - 'devtools/Dockerfile'
+              - '.github/workflows/**'
+              - 'docker-compose.yaml'
       - name: Debug ...
         run: |
           echo "::${{ steps.changes.outputs }}"
@@ -50,4 +54,3 @@ jobs:
         name: "Catch errors"
         if: |
           needs.techdocs.result == 'failure'
-
