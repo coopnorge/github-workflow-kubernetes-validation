@@ -1,0 +1,33 @@
+# Workflow to create special tags (e.g., v0, v1, etc.) when a release is published
+name: release-tagger
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Determine tag to create
+        id: tag_info
+        run: |
+          RELEASE_TAG=${GITHUB_REF##*/}
+          SPECIAL_TAG=$(echo "$RELEASE_TAG" | grep -oE '^v[0-9]+') # extract 'v3' from 'v3.2.1'
+          echo "SPECIAL_TAG=$SPECIAL_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        if: steps.tag_info.outputs.SPECIAL_TAG != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -a "${{ steps.tag_info.outputs.SPECIAL_TAG }}" "$GITHUB_SHA" -m "Release ${{ steps.tag_info.outputs.SPECIAL_TAG }}"
+          git push origin "${{ steps.tag_info.outputs.SPECIAL_TAG }}" --force
