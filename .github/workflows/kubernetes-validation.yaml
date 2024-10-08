@@ -83,7 +83,7 @@ jobs:
 
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
-          ARGOCD_SERVER: ${{ inputs.argocd-server }}
+          ARGOCD_SERVER: api.developer.coop/pravindahal-project
 
       - name: Find Comment
         uses: peter-evans/find-comment@v3
