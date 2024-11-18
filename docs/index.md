@@ -9,16 +9,19 @@ Validation of Kubernetes templates and also a rich diff to state in cluster.
 ## Usage
 
 The workflow uses the Kubernetes engineering image to run the CI steps. The
-image auto detects Kubernetes objects required validating and can also produce
-a diff in case of changes. To use the this in CI, setup the workflow like this:
+image auto-detects Kubernetes objects required validating and can also produce
+a diff in case of changes. To use this in CI, set up the workflow like this:
 
 ```yaml
   kubernetes-ci:
-    name: "Kubernetes CI "
+    name: "Kubernetes CI"
+    needs: ["setup"]
+    permissions:
+      contents: read
+      pull-requests: write
     concurrency:
       group: ${{ github.repository }}-${{ github.workflow }}-kubernetes-ci-${{ github.ref }}
       cancel-in-progress: true
-    needs: ["setup"]
     if: ${{ needs.setup.outputs.run-kubernetes-ci == 'true'}}
     uses: coopnorge/github-workflow-kubernetes-validation/.github/workflows/kubernetes-validation.yaml@v2.0.0
     secrets:
@@ -43,7 +46,7 @@ And have in your `docker-compose.yaml`
       - $HOME/.argocd:/root/.config/argocd
 ```
 
-and in `devtools/Dockerfile` have atleast this image
+and in `devtools/Dockerfile` have at least this image
 
 ```dockerfile
 FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-kubernetes-v1beta1:latest@sha256:6cab3cd24ce510d11105deb0777df7d2c2e959eaed44e049d5ecd2304e217a12 AS kubernetes-devtools
