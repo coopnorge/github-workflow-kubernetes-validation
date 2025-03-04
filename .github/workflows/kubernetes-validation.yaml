@@ -77,9 +77,19 @@ jobs:
             -e ARGOCD_API_TOKEN=${ARGOCD_API_TOKEN} \
             -e ARGOCD_SERVER=${ARGOCD_SERVER} \
             --rm \
-            ${{ inputs.docker-compose-service }} argoCDDiff | head -c 64000 >> body.txt
+            ${{ inputs.docker-compose-service }} argoCDDiff > diff.txt
 
+          head -c 64000 diff.txt > diff_short.txt
+
+          cat diff_short.txt >> body.txt
+
+          echo >> body.txt
           echo "\`\`\`" >> body.txt
+
+          if ! diff -q diff.txt diff_short.txt &>/dev/null; then
+            echo "> [!WARNING]" >> body.txt
+            echo "> The ArgoCD diff is longer than the github comment is allowed to show." >> body.txt
+          fi
 
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
