@@ -83,11 +83,12 @@ jobs:
 
           cat diff_short.txt >> body.txt
 
+          echo >> body.txt
           echo "\`\`\`" >> body.txt
 
           if ! diff -q diff.txt diff_short.txt &>/dev/null; then
             echo "> [!WARNING]" >> body.txt
-            echo "> The ArgoCD diff is longer than the github comment is allowed to show." >> body.txt
+            echo "> The ArgoCD diff is longer than the github comment is allowed to show." >> body.t  cxt
           fi
 
         env:
