@@ -1,4 +1,3 @@
----
 on:
   workflow_call:
     inputs:
@@ -41,7 +40,7 @@ on:
           Token to get read only access to argocd. This is a global secret secrets.ARGOCD_API_TOKEN
 jobs:
   validate-kubernetes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
