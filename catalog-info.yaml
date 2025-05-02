@@ -1,10 +1,11 @@
+# nonk8s
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: github-workflow-kubernetes-validation
   title: Github Workflow Kubernetes Validation
   description: Github Action workflow for validation of kubernetes templates and rich diff against cluster state through ArgoCD
-  lables:
+  tags:
     - "github-workflow"
     - "kubernetes"
     - "argocd"
