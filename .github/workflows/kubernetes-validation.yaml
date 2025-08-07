@@ -55,12 +55,12 @@ jobs:
         id: validate
         run: |
           docker compose \
-            -e SKIP_KUBE_SCORE=${{ inputs.skip-kube-score-checks  && '1' || '0' }}
             --file ${GITHUB_WORKSPACE}/${{ inputs.docker-compose-file }} \
             run \
             --rm \
             -e ARGOCD_API_TOKEN=${ARGOCD_API_TOKEN} \
             -e ARGOCD_SERVER=${ARGOCD_SERVER} \
+            -e SKIP_KUBE_SCORE=${{ inputs.skip-kube-score-checks  && '1' || '0' }} \
             ${{ inputs.docker-compose-service }} ${{ inputs.validate-target }}
         env:
           ARGOCD_API_TOKEN: ${{ secrets.argocd-api-token }}
