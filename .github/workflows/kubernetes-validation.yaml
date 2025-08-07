@@ -1,6 +1,12 @@
 on:
   workflow_call:
     inputs:
+      skip-kube-score-checks:
+        required: false
+        default: false
+        type: boolean
+        description: |
+          Boolean to disable kube-score checks.
       do-argocd-diff:
         required: false
         default: true
@@ -32,12 +38,12 @@ on:
         description: |
           Target to run when running the validate step, defaults to 'validate'
 
-
     secrets:
       argocd-api-token:
         required: false
         description: |
           Token to get read only access to argocd. This is a global secret secrets.ARGOCD_API_TOKEN
+
 jobs:
   validate-kubernetes:
     runs-on: ubuntu-24.04
@@ -49,6 +55,7 @@ jobs:
         id: validate
         run: |
           docker compose \
+            -e SKIP_KUBE_SCORE=${{ inputs.skip-kube-score-checks  && '1' || '0' }}
             --file ${GITHUB_WORKSPACE}/${{ inputs.docker-compose-file }} \
             run \
             --rm \
