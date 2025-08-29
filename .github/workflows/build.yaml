@@ -3,35 +3,49 @@ on:
   pull_request: {}
   push:
     branches:
-      - main
+    - main
   workflow_dispatch: {}
 
 jobs:
+
   setup:
     name: Setup
     runs-on: ubuntu-24.04
     outputs:
       run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' || steps.changes.outputs.devtools == 'true' || github.event_name == 'workflow_dispatch' }}
+      validate-policy-bot-config: ${{ steps.changes.outputs.policy-bot == 'true' }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # pin@v3
-        id: changes
-        with:
-          list-files: json
-          filters: |
-            techdocs:
-              - 'docs/**'
-            devtools:
-              - 'devtools/Dockerfile'
-              - '.github/workflows/**'
-              - 'docker-compose.yaml'
-      - name: Debug ...
-        run: |
-          echo "::${{ steps.changes.outputs }}"
-
+    - uses: actions/checkout@v5
+    - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36   # pin@v3
+      id: changes
+      with:
+        list-files: json
+        filters: |
+          techdocs:
+            - 'docs/**'
+          devtools:
+            - 'devtools/Dockerfile'
+            - '.github/workflows/**'
+            - 'docker-compose.yaml'
+          policy-bot:
+            - '.policy.yml'
+    - name: Debug ...
+      run: |
+        echo "::${{ steps.changes.outputs }}"
     permissions:
       contents: read
       pull-requests: read
+
+  policy-bot:
+    name: Validate policy-bot configuration
+    needs: setup
+    if: needs.setup.outputs.validate-policy-bot-config == 'true'
+    uses: coopnorge/github-workflow-policy-bot-config-validation/.github/workflows/policy-bot-config-validation.yaml@v0
+    permissions:
+      contents: read
+    secrets:
+      policy-bot-server-url: ${{ secrets.POLICY_BOT_BASE_URL }}
+
   techdocs:
     needs: ["setup"]
     if: ${{ needs.setup.outputs.run-techdocs-ci == 'true'}}
@@ -48,12 +62,12 @@ jobs:
 
   build:
     needs:
-      - techdocs
+    - techdocs
+    - policy-bot
     if: always()
     runs-on: ubuntu-24.04
     steps:
-      - run: exit 1
-        name: "Catch errors"
-        if: |
-          needs.techdocs.result == 'failure'
+    - run: exit 1
+      name: "Catch errors"
+      if: ${{ contains(join(needs.*.result, ','), 'failure') || contains(join(needs.*.result, ','), 'cancelled') }}
     permissions: {}
