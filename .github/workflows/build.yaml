@@ -10,7 +10,7 @@ jobs:
 
   setup:
     name: Setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' || steps.changes.outputs.devtools == 'true' || github.event_name == 'workflow_dispatch' }}
       validate-policy-bot-config: ${{ steps.changes.outputs.policy-bot == 'true' }}
@@ -64,10 +64,9 @@ jobs:
     needs:
     - techdocs
     - policy-bot
-    if: always()
-    runs-on: ubuntu-24.04
+    if: failure() || cancelled()
+    runs-on: ubuntu-slim
     steps:
     - run: exit 1
       name: "Catch errors"
-      if: ${{ contains(join(needs.*.result, ','), 'failure') || contains(join(needs.*.result, ','), 'cancelled') }}
     permissions: {}
