@@ -14,5 +14,5 @@ metadata:
     backstage.io/techdocs-ref: dir:.
 spec:
   type: library
-  lifecycle: production
+  lifecycle: deprecated
   owner: cloud-platform
